@@ -1,0 +1,28 @@
+## ── Stage 1: Build ──────────────────────────────────────────────────────────
+FROM maven:3.9-eclipse-temurin-21 AS builder
+
+WORKDIR /build
+
+# Copy POM first so Maven dependency layer is cached separately
+COPY pom.xml .
+RUN mvn dependency:go-offline -q
+
+# Copy sources and build production package
+COPY src ./src
+RUN mvn package -Pproduction -DskipTests -q
+
+## ── Stage 2: Run ────────────────────────────────────────────────────────────
+FROM eclipse-temurin:21-jre
+
+WORKDIR /deployments
+
+# Quarkus fast-jar layout: four layers for better Docker cache utilisation
+COPY --from=builder /build/target/quarkus-app/lib/           lib/
+COPY --from=builder /build/target/quarkus-app/*.jar          ./
+COPY --from=builder /build/target/quarkus-app/app/           app/
+COPY --from=builder /build/target/quarkus-app/quarkus/       quarkus/
+
+EXPOSE 8080
+ENV JAVA_OPTS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar quarkus-run.jar"]
