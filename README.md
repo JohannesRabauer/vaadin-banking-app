@@ -4,6 +4,8 @@
 > with [Johannes Rabauer](https://github.com/JohannesRabauer) and [Kenny Pflug](https://github.com/feO2x).
 >
 > **Watch the session:** https://youtube.com/live/vopBYXp9YV0
+> **Read the slides:** [2026-02-26-guided-coding-instead-of-vibe-coding-in-java.pdf](/2026-02-26-guided-coding-instead-of-vibe-coding-in-java.pdf)
+
 
 ---
 
